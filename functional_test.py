@@ -1,6 +1,7 @@
 #!env/bin/python
 import unittest
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 """
 Functional tests, aka acceptance tests, black-box tests.
@@ -26,14 +27,31 @@ class NewVisitorTest(unittest.TestCase):
 
         # Notice page title and header
         self.assertIn('To-Do', self.browser.title)
-        self.fail('Test completed')
 
         # Invited to enter a to-do item straight away
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(
+            inputbox.get_attribute('placeholder'),
+            'Enter a to-do item'
+        )
 
         # Types 'buy peacock feathers' into a text box
+        inputbox.send_keys('Buy peacock feathers')
 
         # When hitting enter, the page updates and now
         # the page lists '1: Buy peacock feathers' as an item.
+        inputbox.send_keys(Keys.ENTER)
+
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_element_by_tag_name('tr')
+        self.assertTrue(
+            any(row.text == '1: Buy peacock feathers' for row in rows)
+        )
+
+        # Test completed
+        self.fail('Test completed')
+
+
 
 if __name__ == '__main__':
     unittest.main()
