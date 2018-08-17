@@ -17,6 +17,11 @@ class NewVisitorTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
+    def check_for_row_in_list_table(self, row_text):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
+
     def test_can_start_a_list_and_retrieve_it_later(self):
         """
         User goes to its homepage, notices that the page title and header
@@ -42,13 +47,7 @@ class NewVisitorTest(unittest.TestCase):
         # the page lists '1: Buy peacock feathers' as an item.
         inputbox.send_keys(Keys.ENTER)
 
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_element_by_tag_name('tr')
-        print(rows.text)
-        self.assertIn(
-            '1: Buy peacock feathers',
-            [row.text for row in rows],
-            "new to-do item did not show")
+        # self.check_for_row_in_list_table('1: Buy peacock feathers')
 
         # Test completed
         self.fail('Test completed')
