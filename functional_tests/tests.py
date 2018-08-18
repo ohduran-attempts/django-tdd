@@ -3,12 +3,14 @@ import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+from django.test import LiveServerTestCase
+
 """
 Functional tests, aka acceptance tests, black-box tests.
 User stories as comments
 """
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -28,7 +30,7 @@ class NewVisitorTest(unittest.TestCase):
         mentions a tod-do list.
         """
         # Check out homepage
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         # Notice page title and header
         self.assertIn('To-Do', self.browser.title)
@@ -51,8 +53,3 @@ class NewVisitorTest(unittest.TestCase):
 
         # Test completed
         self.fail('Test completed')
-
-
-
-if __name__ == '__main__':
-    unittest.main()
