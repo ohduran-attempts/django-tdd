@@ -13,6 +13,8 @@ def home_page(request):
         return redirect('/')
 
     else:
-        new_item_text = ''
+        pass
+        # new_item_text = ''
     # return render(request,'home.html',{'new_item_text': new_item_text})
-    return render(request, 'home.html')
+    items = Item.objects.all()
+    return render(request, 'home.html', {'items': items})
