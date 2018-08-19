@@ -2,7 +2,7 @@
 This file demonstrates writing tests using the unittest module.
 They will pass when you run 'manage.py test'
 """
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.http import HttpRequest
 from django.core.urlresolvers import resolve
 from django.template.loader import render_to_string
@@ -39,9 +39,10 @@ class HomePageTest(TestCase):
         self.assertEqual(new_item.text, 'A new list item')
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/lists/the-only-list')
+        print(response)
 
-        self.assertIn(b'A new list item', response.content)
+        #self.assertIn(b'A new list item', response.content)
         #
         # expected_html = render_to_string(
         #     'home.html',
@@ -73,3 +74,16 @@ class ItemModelTest(TestCase):
         request = HttpRequest()
         home_page(request)
         self.assertEqual(Item.objects.all().count(), 0)
+
+class ListViewTest(TestCase):
+
+    def test_list_view_displays_all_items(self):
+        Item.objects.create(text='item 1')
+        Item.objects.create(text='item 2')
+
+        client = Client()
+        response = client.get('/lists/the-only-list')
+
+        self.assertIn(b'item 1', response.content)
+        self.assertIn(b'item 2', response.content)
+        self.assertTemplateUsed(response, 'list.html')
