@@ -48,8 +48,41 @@ class NewVisitorTest(LiveServerTestCase):
         # When hitting enter, the page updates and now
         # the page lists '1: Buy peacock feathers' as an item.
         inputbox.send_keys(Keys.ENTER)
+        user_list_url = self.browser.current_url
+        self.assertRegex(user_list_url, '/lists/.+')
 
-        # self.check_for_row_in_list_table('1: Buy peacock feathers')
+        self.check_for_row_in_list_table('1: Buy peacock feathers')
+
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Look outside to see whether it rains.')
+        inputbox.send_keys(Keys.ENTER)
+
+        self.check_for_row_in_list_table('2: Look outside to see whether it rains.')
+
+        # Now a new user comes along to the site
+        self.browser.quit()
+
+        # Start a new session and he doesn't see anything from the previous user.
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('Look outside to see whether it rains', page_text)
+
+        # New user starts a new list
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
+
+        new_user_list_url = self.browser.current_url
+        self.assertRegex(new_user_list_url, '/lists/.+')
+        self.assertNotEqual(new_user_list_url, user_list_url)
+
+        # And no trace of the first user's list
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('Look outside to see whether it rains', page_text)
+
+
 
         # Test completed
         self.fail('Test completed')
